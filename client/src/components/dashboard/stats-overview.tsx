@@ -85,17 +85,17 @@ export default function StatsOverview() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
       {statsData.map((stat, index) => {
         const Icon = stat.icon;
         return (
           <Card key={index} className="trading-card">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-slate-400 text-sm">{stat.title}</p>
-                  <p className="text-2xl font-bold text-slate-50">{stat.value}</p>
-                  <p className={`text-sm ${
+                <div className="flex-1 min-w-0">
+                  <p className="text-slate-400 text-xs sm:text-sm truncate">{stat.title}</p>
+                  <p className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-50 truncate">{stat.value}</p>
+                  <p className={`text-xs sm:text-sm truncate ${
                     stat.changeType === 'positive' ? 'text-green-400' :
                     stat.changeType === 'negative' ? 'text-red-400' :
                     'text-yellow-400'
@@ -103,8 +103,8 @@ export default function StatsOverview() {
                     {stat.change}
                   </p>
                 </div>
-                <div className={`${stat.bgColor} rounded-full p-3`}>
-                  <Icon className={`h-6 w-6 ${stat.iconColor}`} />
+                <div className={`${stat.bgColor} rounded-full p-2 sm:p-3 flex-shrink-0`}>
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6 ${stat.iconColor}`} />
                 </div>
               </div>
             </CardContent>

@@ -14,17 +14,17 @@ export default function OrderBookAnalytics() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
           Order Book Analytics
         </CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {[...Array(2)].map((_, i) => (
-                <div key={i} className="bg-slate-700 rounded-lg p-4">
+                <div key={i} className="bg-slate-700 rounded-lg p-3 sm:p-4">
                   <Skeleton className="h-4 w-32 mb-2" />
                   <Skeleton className="h-8 w-16 mb-2" />
                   <Skeleton className="h-3 w-24" />
@@ -44,22 +44,22 @@ export default function OrderBookAnalytics() {
             </div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-400">
+          <div className="text-center text-red-400 text-sm">
             Failed to load order book analytics
           </div>
         ) : analytics ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400">Sweep Price (100 shares)</div>
-                <div className="text-xl font-bold text-green-400">{analytics.sweepPrice100}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="bg-slate-700 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-slate-400">Sweep Price (100 shares)</div>
+                <div className="text-lg sm:text-xl font-bold text-green-400">{analytics.sweepPrice100}</div>
                 <div className="text-xs text-slate-400">
                   Bid: {analytics.bidPrice100} | Ask: {analytics.askPrice100}
                 </div>
               </div>
-              <div className="bg-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400">Sweep Price (1000 shares)</div>
-                <div className="text-xl font-bold text-red-400">{analytics.sweepPrice1000}</div>
+              <div className="bg-slate-700 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-slate-400">Sweep Price (1000 shares)</div>
+                <div className="text-lg sm:text-xl font-bold text-red-400">{analytics.sweepPrice1000}</div>
                 <div className="text-xs text-slate-400">
                   Bid: {analytics.bidPrice1000} | Ask: {analytics.askPrice1000}
                 </div>
@@ -67,12 +67,12 @@ export default function OrderBookAnalytics() {
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-2">Discontinuity Analysis</h4>
+              <h4 className="text-xs sm:text-sm font-medium text-slate-400 mb-2">Discontinuity Analysis</h4>
               <div className="space-y-2">
                 {analytics.gaps.map((gap, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm text-slate-50">{gap.range}</span>
-                    <span className={`text-sm ${
+                    <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">{gap.range}</span>
+                    <span className={`text-xs sm:text-sm flex-shrink-0 ${
                       gap.gap.includes('3') ? 'text-red-400' : 'text-yellow-400'
                     }`}>
                       Gap: {gap.gap}
@@ -83,7 +83,7 @@ export default function OrderBookAnalytics() {
             </div>
           </div>
         ) : (
-          <div className="text-center text-slate-400">
+          <div className="text-center text-slate-400 text-sm">
             No analytics data available
           </div>
         )}

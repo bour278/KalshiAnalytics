@@ -57,15 +57,15 @@ export default function OrderBookChart() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-3">
+          <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
             Order Book Depth
           </CardTitle>
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-slate-400">Contract:</span>
+            <span className="text-xs sm:text-sm text-slate-400 flex-shrink-0">Contract:</span>
             <Select value={selectedContract} onValueChange={setSelectedContract}>
-              <SelectTrigger className="w-48 bg-slate-700 border-slate-600 text-slate-300">
+              <SelectTrigger className="w-full sm:w-48 bg-slate-700 border-slate-600 text-slate-300 text-xs sm:text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-slate-800 border-slate-700">
@@ -73,7 +73,7 @@ export default function OrderBookChart() {
                   <SelectItem 
                     key={contract.value} 
                     value={contract.value}
-                    className="text-slate-300 focus:bg-slate-700"
+                    className="text-slate-300 focus:bg-slate-700 text-xs sm:text-sm"
                   >
                     {contract.label}
                   </SelectItem>
@@ -83,14 +83,14 @@ export default function OrderBookChart() {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="h-64">
+      <CardContent className="px-3 sm:px-6">
+        <div className="h-48 sm:h-56 md:h-64">
           {isLoading ? (
             <div className="h-full flex items-center justify-center">
               <Skeleton className="h-full w-full" />
             </div>
           ) : error ? (
-            <div className="h-full flex items-center justify-center text-red-400">
+            <div className="h-full flex items-center justify-center text-red-400 text-sm">
               Failed to load order book data
             </div>
           ) : orderBookData && orderBookData.length > 0 ? (
@@ -100,18 +100,21 @@ export default function OrderBookChart() {
                 <XAxis 
                   dataKey="price" 
                   stroke="#94A3B8"
-                  fontSize={12}
+                  fontSize={10}
+                  tick={{ fontSize: 10 }}
                 />
                 <YAxis 
                   stroke="#94A3B8"
-                  fontSize={12}
+                  fontSize={10}
+                  tick={{ fontSize: 10 }}
                 />
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: '#1E293B', 
                     border: '1px solid #475569',
                     borderRadius: '8px',
-                    color: '#F8FAFC'
+                    color: '#F8FAFC',
+                    fontSize: '12px'
                   }}
                 />
                 <Bar 
@@ -129,7 +132,7 @@ export default function OrderBookChart() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-slate-400">
+            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
               No order book data available
             </div>
           )}

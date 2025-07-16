@@ -42,22 +42,23 @@ export default function PriceChart() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
             Price Movement (VWAP)
           </CardTitle>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1 sm:space-x-2">
             {timeframes.map((tf) => (
               <Button
                 key={tf.value}
                 variant={timeframe === tf.value ? "default" : "outline"}
                 size="sm"
                 onClick={() => setTimeframe(tf.value)}
-                className={timeframe === tf.value ? 
-                  "bg-blue-600/20 text-blue-400 border-blue-600" : 
-                  "bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600"
-                }
+                className={`text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2 ${
+                  timeframe === tf.value ? 
+                    "bg-blue-600/20 text-blue-400 border-blue-600" : 
+                    "bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600"
+                }`}
               >
                 {tf.label}
               </Button>
@@ -65,14 +66,14 @@ export default function PriceChart() {
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="h-64">
+      <CardContent className="px-3 sm:px-6">
+        <div className="h-48 sm:h-56 md:h-64">
           {isLoading ? (
             <div className="h-full flex items-center justify-center">
               <Skeleton className="h-full w-full" />
             </div>
           ) : error ? (
-            <div className="h-full flex items-center justify-center text-red-400">
+            <div className="h-full flex items-center justify-center text-red-400 text-sm">
               Failed to load price data
             </div>
           ) : chartData && chartData.length > 0 ? (
@@ -82,11 +83,13 @@ export default function PriceChart() {
                 <XAxis 
                   dataKey="time" 
                   stroke="#94A3B8"
-                  fontSize={12}
+                  fontSize={10}
+                  tick={{ fontSize: 10 }}
                 />
                 <YAxis 
                   stroke="#94A3B8"
-                  fontSize={12}
+                  fontSize={10}
+                  tick={{ fontSize: 10 }}
                   tickFormatter={(value) => `$${value.toFixed(2)}`}
                 />
                 <Tooltip 
@@ -94,7 +97,8 @@ export default function PriceChart() {
                     backgroundColor: '#1E293B', 
                     border: '1px solid #475569',
                     borderRadius: '8px',
-                    color: '#F8FAFC'
+                    color: '#F8FAFC',
+                    fontSize: '12px'
                   }}
                   formatter={(value: number, name: string) => [
                     `$${value.toFixed(2)}`, 
@@ -122,7 +126,7 @@ export default function PriceChart() {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-full flex items-center justify-center text-slate-400">
+            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
               No price data available
             </div>
           )}

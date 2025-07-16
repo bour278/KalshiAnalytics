@@ -42,22 +42,22 @@ export default function ArbitrageTable() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
             Arbitrage Opportunities
           </CardTitle>
           <Button
             onClick={handleRefresh}
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm self-start sm:self-auto"
           >
-            <RefreshCw className="h-4 w-4 mr-1" />
+            <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
             Refresh
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-3 sm:px-6">
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
@@ -71,48 +71,48 @@ export default function ArbitrageTable() {
             ))}
           </div>
         ) : error ? (
-          <div className="text-center text-red-400 py-8">
+          <div className="text-center text-red-400 py-8 text-sm">
             Failed to load arbitrage opportunities
           </div>
         ) : opportunities && opportunities.length > 0 ? (
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto -mx-3 sm:mx-0">
+            <table className="w-full min-w-[600px] sm:min-w-0">
               <thead>
                 <tr className="border-b border-slate-700">
-                  <th className="text-left py-2 text-sm font-medium text-slate-400">Contract</th>
-                  <th className="text-left py-2 text-sm font-medium text-slate-400">Kalshi</th>
-                  <th className="text-left py-2 text-sm font-medium text-slate-400">Polymarket</th>
-                  <th className="text-left py-2 text-sm font-medium text-slate-400">Spread</th>
-                  <th className="text-left py-2 text-sm font-medium text-slate-400">Confidence</th>
+                  <th className="text-left py-2 px-3 sm:px-0 text-xs sm:text-sm font-medium text-slate-400">Contract</th>
+                  <th className="text-left py-2 px-3 sm:px-0 text-xs sm:text-sm font-medium text-slate-400">Kalshi</th>
+                  <th className="text-left py-2 px-3 sm:px-0 text-xs sm:text-sm font-medium text-slate-400">Polymarket</th>
+                  <th className="text-left py-2 px-3 sm:px-0 text-xs sm:text-sm font-medium text-slate-400">Spread</th>
+                  <th className="text-left py-2 px-3 sm:px-0 text-xs sm:text-sm font-medium text-slate-400">Confidence</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-700">
                 {opportunities.map((opportunity) => (
                   <tr key={opportunity.id} className="hover:bg-slate-700/50">
-                    <td className="py-3 text-sm">
-                      <div className="font-medium text-slate-50">
+                    <td className="py-3 px-3 sm:px-0 text-xs sm:text-sm">
+                      <div className="font-medium text-slate-50 truncate max-w-[150px] sm:max-w-none">
                         {opportunity.kalshiContract.title}
                       </div>
-                      <div className="text-slate-400 text-xs">
+                      <div className="text-slate-400 text-xs hidden sm:block">
                         {opportunity.kalshiContract.description}
                       </div>
                     </td>
-                    <td className="py-3 text-sm">
+                    <td className="py-3 px-3 sm:px-0 text-xs sm:text-sm">
                       <span className="text-green-400">
                         {formatPrice(opportunity.kalshiPrice)}
                       </span>
                     </td>
-                    <td className="py-3 text-sm">
+                    <td className="py-3 px-3 sm:px-0 text-xs sm:text-sm">
                       <span className="text-red-400">
                         {formatPrice(opportunity.polymarketPrice)}
                       </span>
                     </td>
-                    <td className="py-3 text-sm">
+                    <td className="py-3 px-3 sm:px-0 text-xs sm:text-sm">
                       <span className="text-yellow-400 font-medium">
                         {formatSpread(opportunity.spread)}
                       </span>
                     </td>
-                    <td className="py-3 text-sm">
+                    <td className="py-3 px-3 sm:px-0 text-xs sm:text-sm">
                       {getConfidenceBadge(opportunity.confidence)}
                     </td>
                   </tr>
@@ -121,7 +121,7 @@ export default function ArbitrageTable() {
             </table>
           </div>
         ) : (
-          <div className="text-center text-slate-400 py-8">
+          <div className="text-center text-slate-400 py-8 text-sm">
             No arbitrage opportunities available
           </div>
         )}

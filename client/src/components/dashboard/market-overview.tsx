@@ -12,12 +12,12 @@ export default function MarketOverview() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
           Market Overview
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {isLoading ? (
           <div className="space-y-4">
             <div>
@@ -33,26 +33,26 @@ export default function MarketOverview() {
             </div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-400">
+          <div className="text-center text-red-400 text-sm">
             Failed to load market overview
           </div>
         ) : overview ? (
           <>
             <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-3">By Sector</h4>
-              <div className="space-y-3">
+              <h4 className="text-xs sm:text-sm font-medium text-slate-400 mb-2 sm:mb-3">By Sector</h4>
+              <div className="space-y-2 sm:space-y-3">
                 {overview.sectorBreakdown.map((sector, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm text-slate-50">{sector.sector}</span>
-                    <div className="flex items-center space-x-2">
+                    <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">{sector.sector}</span>
+                    <div className="flex items-center space-x-2 flex-shrink-0">
                       <Progress 
                         value={sector.percentage} 
-                        className="w-16 h-2"
+                        className="w-12 sm:w-16 h-2"
                         style={{
                           backgroundColor: '#475569'
                         }}
                       />
-                      <span className="text-sm text-slate-400 w-8">
+                      <span className="text-xs sm:text-sm text-slate-400 w-6 sm:w-8">
                         {sector.percentage}%
                       </span>
                     </div>
@@ -62,12 +62,12 @@ export default function MarketOverview() {
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-3">Top Performers</h4>
+              <h4 className="text-xs sm:text-sm font-medium text-slate-400 mb-2 sm:mb-3">Top Performers</h4>
               <div className="space-y-2">
                 {overview.topPerformers.map((performer, index) => (
                   <div key={index} className="flex items-center justify-between">
-                    <span className="text-sm text-slate-50">{performer.name}</span>
-                    <span className={`text-sm ${
+                    <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">{performer.name}</span>
+                    <span className={`text-xs sm:text-sm flex-shrink-0 ${
                       performer.change.startsWith('+') ? 'text-green-400' : 'text-red-400'
                     }`}>
                       {performer.change}
@@ -78,7 +78,7 @@ export default function MarketOverview() {
             </div>
           </>
         ) : (
-          <div className="text-center text-slate-400">
+          <div className="text-center text-slate-400 text-sm">
             No market data available
           </div>
         )}

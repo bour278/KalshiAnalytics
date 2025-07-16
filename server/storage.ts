@@ -77,6 +77,175 @@ export class MemStorage implements IStorage {
     this.currentPriceHistoryId = 1;
     this.currentOrderBookDataId = 1;
     this.currentArbitrageId = 1;
+    
+    // Initialize with sample data
+    this.initializeSampleData();
+  }
+
+  private initializeSampleData() {
+    // Create sample contracts
+    const sampleContracts = [
+      {
+        title: "2024 Presidential Election Winner",
+        description: "Will Donald Trump win the 2024 Presidential Election?",
+        category: "Politics",
+        platform: "kalshi",
+        externalId: "PRES-2024-TRUMP",
+        currentPrice: "0.52",
+        volume: "2400000",
+        liquidity: "85000",
+        isActive: true
+      },
+      {
+        title: "2024 Presidential Election Winner",
+        description: "Will Donald Trump win the 2024 Presidential Election?",
+        category: "Politics", 
+        platform: "polymarket",
+        externalId: "PRES-2024-TRUMP-PM",
+        currentPrice: "0.48",
+        volume: "1800000",
+        liquidity: "72000",
+        isActive: true
+      },
+      {
+        title: "Fed Rate Decision Dec 2024",
+        description: "Will the Fed cut rates by 0.25% in December 2024?",
+        category: "Economics",
+        platform: "kalshi",
+        externalId: "FED-DEC-2024",
+        currentPrice: "0.73",
+        volume: "850000",
+        liquidity: "45000",
+        isActive: true
+      },
+      {
+        title: "Q4 GDP Growth Rate",
+        description: "Will Q4 2024 GDP growth exceed 2.5%?",
+        category: "Economics",
+        platform: "kalshi",
+        externalId: "GDP-Q4-2024",
+        currentPrice: "0.64",
+        volume: "420000",
+        liquidity: "28000",
+        isActive: true
+      },
+      {
+        title: "Bitcoin Price Target",
+        description: "Will Bitcoin reach $100,000 by end of 2024?",
+        category: "Crypto",
+        platform: "polymarket",
+        externalId: "BTC-100K-2024",
+        currentPrice: "0.38",
+        volume: "1200000",
+        liquidity: "95000",
+        isActive: true
+      }
+    ];
+
+    // Add contracts to storage
+    sampleContracts.forEach(contract => {
+      const id = this.currentContractId++;
+      const now = new Date();
+      const fullContract: Contract = {
+        ...contract,
+        id,
+        createdAt: now,
+        updatedAt: now
+      };
+      this.contracts.set(id, fullContract);
+    });
+
+    // Create sample price history
+    const baseTime = Date.now() - (24 * 60 * 60 * 1000); // 24 hours ago
+    for (let contractId = 1; contractId <= 5; contractId++) {
+      for (let i = 0; i < 50; i++) {
+        const id = this.currentPriceHistoryId++;
+        const timestamp = new Date(baseTime + (i * 30 * 60 * 1000)); // Every 30 minutes
+        const basePrice = contractId === 1 ? 0.52 : contractId === 2 ? 0.48 : contractId === 3 ? 0.73 : contractId === 4 ? 0.64 : 0.38;
+        const variance = (Math.random() - 0.5) * 0.1;
+        const price = Math.max(0.01, Math.min(0.99, basePrice + variance));
+        const volume = Math.floor(Math.random() * 50000) + 10000;
+        
+        this.priceHistory.set(id, {
+          id,
+          contractId,
+          price: price.toFixed(4),
+          volume: volume.toString(),
+          timestamp
+        });
+      }
+    }
+
+    // Create sample order book data
+    for (let contractId = 1; contractId <= 5; contractId++) {
+      const contract = this.contracts.get(contractId);
+      if (contract) {
+        const currentPrice = parseFloat(contract.currentPrice || '0.5');
+        
+        // Create bid orders (below current price)
+        for (let i = 0; i < 10; i++) {
+          const id = this.currentOrderBookDataId++;
+          const price = currentPrice - (i + 1) * 0.01;
+          const size = Math.floor(Math.random() * 5000) + 1000;
+          
+          this.orderBookData.set(id, {
+            id,
+            contractId,
+            price: price.toFixed(4),
+            size: size.toString(),
+            side: 'bid',
+            timestamp: new Date()
+          });
+        }
+        
+        // Create ask orders (above current price)
+        for (let i = 0; i < 10; i++) {
+          const id = this.currentOrderBookDataId++;
+          const price = currentPrice + (i + 1) * 0.01;
+          const size = Math.floor(Math.random() * 5000) + 1000;
+          
+          this.orderBookData.set(id, {
+            id,
+            contractId,
+            price: price.toFixed(4),
+            size: size.toString(),
+            side: 'ask',
+            timestamp: new Date()
+          });
+        }
+      }
+    }
+
+    // Create sample arbitrage opportunities
+    const opportunities = [
+      {
+        kalshiContractId: 1,
+        polymarketContractId: 2,
+        kalshiPrice: "0.52",
+        polymarketPrice: "0.48",
+        spread: "7.7",
+        confidence: "high",
+        isActive: true
+      },
+      {
+        kalshiContractId: 3,
+        polymarketContractId: 5,
+        kalshiPrice: "0.73",
+        polymarketPrice: "0.71",
+        spread: "2.8",
+        confidence: "medium",
+        isActive: true
+      }
+    ];
+
+    opportunities.forEach(opp => {
+      const id = this.currentArbitrageId++;
+      this.arbitrageOpportunities.set(id, {
+        ...opp,
+        id,
+        createdAt: new Date()
+      });
+    });
   }
 
   async getUser(id: number): Promise<User | undefined> {

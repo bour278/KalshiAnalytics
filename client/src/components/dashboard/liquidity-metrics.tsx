@@ -25,17 +25,17 @@ export default function LiquidityMetrics() {
 
   return (
     <Card className="trading-card">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-slate-50">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg font-semibold text-slate-50">
           Liquidity Metrics
         </CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {[...Array(2)].map((_, i) => (
-                <div key={i} className="bg-slate-700 rounded-lg p-4">
+                <div key={i} className="bg-slate-700 rounded-lg p-3 sm:p-4">
                   <Skeleton className="h-4 w-20 mb-2" />
                   <Skeleton className="h-8 w-16 mb-2" />
                   <Skeleton className="h-3 w-24" />
@@ -55,44 +55,44 @@ export default function LiquidityMetrics() {
             </div>
           </div>
         ) : error ? (
-          <div className="text-center text-red-400">
+          <div className="text-center text-red-400 text-sm">
             Failed to load liquidity metrics
           </div>
         ) : metrics ? (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400">Avg Spread</div>
-                <div className="text-xl font-bold text-slate-50">{metrics.avgSpread}</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="bg-slate-700 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-slate-400">Avg Spread</div>
+                <div className="text-lg sm:text-xl font-bold text-slate-50">{metrics.avgSpread}</div>
                 <div className="text-xs text-green-400">-0.3¢ from yesterday</div>
               </div>
-              <div className="bg-slate-700 rounded-lg p-4">
-                <div className="text-sm text-slate-400">Market Depth</div>
-                <div className="text-xl font-bold text-slate-50">{metrics.marketDepth}</div>
+              <div className="bg-slate-700 rounded-lg p-3 sm:p-4">
+                <div className="text-xs sm:text-sm text-slate-400">Market Depth</div>
+                <div className="text-lg sm:text-xl font-bold text-slate-50">{metrics.marketDepth}</div>
                 <div className="text-xs text-green-400">+12% from yesterday</div>
               </div>
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-slate-400 mb-2">Information Flow</h4>
+              <h4 className="text-xs sm:text-sm font-medium text-slate-400 mb-2">Information Flow</h4>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-50">News Impact</span>
+                  <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">News Impact</span>
                   {getMetricBadge(metrics.newsImpact)}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-50">Auto-correlation</span>
+                  <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">Auto-correlation</span>
                   {getMetricBadge(metrics.autoCorrelation)}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-slate-50">Predictive Value</span>
+                  <span className="text-xs sm:text-sm text-slate-50 truncate flex-1 mr-2">Predictive Value</span>
                   {getMetricBadge(metrics.predictiveValue)}
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="text-center text-slate-400">
+          <div className="text-center text-slate-400 text-sm">
             No metrics data available
           </div>
         )}

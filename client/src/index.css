@@ -98,6 +98,29 @@
   }
 }
 
+/* Mobile-first responsive utilities */
+@layer utilities {
+  .mobile-scroll {
+    @apply overflow-x-auto -mx-3 px-3 sm:mx-0 sm:px-0;
+  }
+  
+  .mobile-grid {
+    @apply grid gap-3 sm:gap-4 md:gap-6;
+  }
+  
+  .mobile-padding {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+  
+  .mobile-text {
+    @apply text-xs sm:text-sm md:text-base;
+  }
+  
+  .mobile-button {
+    @apply text-xs sm:text-sm px-2 sm:px-3 py-1 sm:py-2;
+  }
+}
+
 /* Custom scrollbar for dark theme */
 ::-webkit-scrollbar {
   width: 8px;

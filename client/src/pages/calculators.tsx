@@ -19,6 +19,9 @@ import {
   Info,
   AlertTriangle
 } from "lucide-react";
+import Sidebar from "@/components/layout/sidebar";
+import Header from "@/components/layout/header";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ArbitrageResult {
   profit: number;
@@ -48,6 +51,8 @@ interface PositionResult {
 }
 
 export default function Calculators() {
+  const isMobile = useIsMobile();
+  
   // Arbitrage Calculator State
   const [kalshiPrice, setKalshiPrice] = useState<string>("0.65");
   const [polymarketPrice, setPolymarketPrice] = useState<string>("0.58");
@@ -161,7 +166,11 @@ export default function Calculators() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex min-h-screen bg-slate-900 text-slate-50">
+      <Sidebar />
+      <main className={`flex-1 overflow-auto ${isMobile ? 'ml-0' : ''}`}>
+        <Header />
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Trading Calculators</h1>
         <div className="flex items-center gap-2">
@@ -573,6 +582,8 @@ export default function Calculators() {
           </div>
         </TabsContent>
       </Tabs>
+        </div>
+      </main>
     </div>
   );
 }

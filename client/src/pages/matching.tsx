@@ -21,6 +21,9 @@ import {
   Activity
 } from "lucide-react";
 import type { Contract } from "@shared/schema";
+import Sidebar from "@/components/layout/sidebar";
+import Header from "@/components/layout/header";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ContractMatch {
   kalshiContract: Contract;
@@ -33,6 +36,7 @@ interface ContractMatch {
 }
 
 export default function Matching() {
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [sortBy, setSortBy] = useState("similarity");
@@ -130,7 +134,11 @@ export default function Matching() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex min-h-screen bg-slate-900 text-slate-50">
+      <Sidebar />
+      <main className={`flex-1 overflow-auto ${isMobile ? 'ml-0' : ''}`}>
+        <Header />
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Contract Matching</h1>
         <div className="flex items-center gap-2">
@@ -400,6 +408,8 @@ export default function Matching() {
           </CardContent>
         </Card>
       )}
+        </div>
+      </main>
     </div>
   );
 }

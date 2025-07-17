@@ -8,8 +8,12 @@ import { Button } from "@/components/ui/button";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from "recharts";
 import { TrendingUp, TrendingDown, Activity, Clock, DollarSign, BarChart3 } from "lucide-react";
 import type { ChartDataPoint, Contract } from "@shared/schema";
+import Sidebar from "@/components/layout/sidebar";
+import Header from "@/components/layout/header";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Charts() {
+  const isMobile = useIsMobile();
   const [selectedContract, setSelectedContract] = useState<number>(1);
   const [timeframe, setTimeframe] = useState<string>("1h");
   const [chartType, setChartType] = useState<string>("price");
@@ -44,7 +48,11 @@ export default function Charts() {
   } : null;
 
   return (
-    <div className="space-y-6">
+    <div className="flex min-h-screen bg-slate-900 text-slate-50">
+      <Sidebar />
+      <main className={`flex-1 overflow-auto ${isMobile ? 'ml-0' : ''}`}>
+        <Header />
+        <div className="p-3 sm:p-4 md:p-6 space-y-4 md:space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Price Charts</h1>
         <div className="flex items-center gap-4">
@@ -317,6 +325,8 @@ export default function Charts() {
           </div>
         </CardContent>
       </Card>
+        </div>
+      </main>
     </div>
   );
 }

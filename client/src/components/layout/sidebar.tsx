@@ -20,23 +20,24 @@ const navigation = [
     name: "Trading",
     items: [
       { name: "Dashboard", href: "/", icon: LayoutDashboard },
+      { name: "Contracts", href: "/contracts", icon: BookOpen },
       { name: "Arbitrage", href: "/arbitrage", icon: ArrowLeftRight },
-      { name: "Order Books", href: "/order-books", icon: BookOpen },
     ]
   },
   {
     name: "Analytics",
     items: [
+      { name: "Advanced Analytics", href: "/analytics", icon: TrendingUp },
       { name: "Price Charts", href: "/charts", icon: TrendingUp },
-      { name: "Metrics", href: "/metrics", icon: Gauge },
       { name: "Market Overview", href: "/overview", icon: Globe },
     ]
   },
   {
     name: "Tools",
     items: [
+      { name: "Trading Tools", href: "/tools", icon: Settings },
       { name: "Contract Matching", href: "/matching", icon: Search },
-      { name: "Settings", href: "/settings", icon: Settings },
+      { name: "Calculators", href: "/calculators", icon: Settings },
     ]
   }
 ];

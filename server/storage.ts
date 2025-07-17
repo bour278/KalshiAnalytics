@@ -413,12 +413,18 @@ export class MemStorage implements IStorage {
       percentage: Math.round((count / totalContracts) * 100)
     }));
     
-    // Get recent price changes (mock for now)
-    const topPerformers = [
-      { name: 'Election Winner', change: '+8.2%' },
-      { name: 'Fed Rate Cut', change: '+5.7%' },
-      { name: 'GDP Growth', change: '-2.1%' }
-    ];
+    // Get top performers based on actual contract data
+    const topPerformers = contracts
+      .sort((a, b) => parseInt(b.volume || "0") - parseInt(a.volume || "0"))
+      .slice(0, 4)
+      .map(contract => {
+        const priceFloat = parseFloat(contract.currentPrice || "0.5");
+        const change = ((priceFloat - 0.5) * 100).toFixed(1);
+        return {
+          name: contract.title.length > 20 ? contract.title.substring(0, 20) + "..." : contract.title,
+          change: change.startsWith('-') ? change + "%" : "+" + change + "%"
+        };
+      });
     
     return {
       sectorBreakdown,

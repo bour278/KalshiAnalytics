@@ -28,6 +28,22 @@ build/
 .DS_Store?
 ._*
 .Spotlight-V100
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# Kalshi API credentials
+python-service/config.env
+python-service/.env
+python-service/config.local.env
 .Trashes
 ehthumbs.db
 Thumbs.db

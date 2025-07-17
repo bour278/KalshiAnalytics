@@ -38,19 +38,19 @@ The project now uses a **microservices architecture** with:
 check-ports.bat
 
 # Linux/macOS:
-chmod +x check-ports.sh
 ./check-ports.sh
 ```
 
 #### Start All Services:
 ```bash
 # Windows:
-start-dev.bat
+run.bat
 
 # Linux/macOS:
-chmod +x start-dev.sh
-./start-dev.sh
+./run.sh
 ```
+
+> **Note:** The simple commands above use wrapper scripts that call the detailed scripts in the `scripts/` directory.
 
 ### Option 2: Manual Setup
 

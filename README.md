@@ -48,6 +48,35 @@ KalshiAnalytics/
 │   ├── 📁 src/
 │   │   ├── 📁 components/     # Reusable UI components
 │   │   │   ├── 📁 dashboard/  # Dashboard-specific components
+│   │   │   ├── 📁 layout/     # Layout components  
+│   │   │   └── 📁 ui/         # shadcn/ui components
+│   │   ├── 📁 pages/          # Page components
+│   │   └── 📁 lib/            # Utilities and configurations
+├── 📁 server/                 # Node.js backend
+│   ├── index.ts               # Main server file
+│   ├── routes.ts              # API routes
+│   ├── storage.ts             # Data layer
+│   └── kalshi-service.ts      # Python service integration
+├── 📁 python-service/         # Kalshi API microservice
+│   ├── main.py                # FastAPI application
+│   ├── kalshi_client.py       # Kalshi API client
+│   ├── analytics.py           # Analytics engine
+│   ├── models.py              # Data models
+│   └── requirements.txt       # Python dependencies
+├── 📁 scripts/                # Development utilities
+│   ├── start-dev.sh           # Linux/macOS startup
+│   ├── start-dev.bat          # Windows startup
+│   ├── check-ports.sh         # Port conflict checker
+│   └── check-ports.bat        # Windows port checker
+├── 📁 docs/                   # Documentation
+│   ├── KALSHI_API_SETUP.md    # Setup guide
+│   ├── ARCHITECTURE.md        # Architecture docs
+│   └── features.md            # Feature documentation
+├── run.sh                     # Quick start (Linux/macOS)
+├── run.bat                    # Quick start (Windows)
+├── check-ports.sh             # Port checker (Linux/macOS)
+├── check-ports.bat            # Port checker (Windows)
+└── docker-compose.yml         # Container orchestration
 │   │   │   ├── 📁 layout/     # Layout components (Header, Sidebar)
 │   │   │   └── 📁 ui/         # Base UI components (shadcn/ui)
 │   │   ├── 📁 hooks/          # Custom React hooks
@@ -69,7 +98,7 @@ KalshiAnalytics/
 - npm or yarn
 - Git
 
-### Installation
+### Quick Start
 
 1. **Clone the repository**
    ```bash
@@ -77,18 +106,36 @@ KalshiAnalytics/
    cd KalshiAnalytics
    ```
 
-2. **Install dependencies**
-   ```bash
-   npm install
+2. **Configure Kalshi API credentials**
+   Create `python-service/config.env` with your credentials:
+   ```env
+   KALSHI_EMAIL=your-email@example.com
+   KALSHI_PASSWORD=your-password
+   KALSHI_BASE_URL=https://trading-api.kalshi.com/trade-api/v2
    ```
 
-3. **Start the development server**
+3. **Check for port conflicts (optional)**
    ```bash
-   npm run dev
+   # Windows:
+   check-ports.bat
+   
+   # Linux/macOS:
+   ./check-ports.sh
    ```
 
-4. **Open your browser**
+4. **Start all services**
+   ```bash
+   # Windows:
+   run.bat
+   
+   # Linux/macOS:
+   ./run.sh
+   ```
+
+5. **Open your browser**
    Navigate to `http://localhost:5173`
+
+> **📖 Detailed Setup:** See [docs/KALSHI_API_SETUP.md](docs/KALSHI_API_SETUP.md) for comprehensive setup instructions
 
 ## 🛠️ Technology Stack
 
@@ -101,16 +148,23 @@ KalshiAnalytics/
 - **React Query** - Server state management
 - **Wouter** - Minimalist routing
 
-### Backend
-- **Node.js** - JavaScript runtime
+### Backend (Node.js)
 - **Express** - Web application framework
 - **TypeScript** - Type-safe development
+- **HTTP Client** - Communication with Python service
+
+### Python Microservice
+- **FastAPI** - Modern Python web framework
+- **httpx** - Async HTTP client for Kalshi API
+- **pandas/numpy** - Data processing and analytics
+- **Pydantic** - Data validation and modeling
+- **uvicorn** - ASGI server
 
 ### Development Tools
 - **Vite** - Fast build tool and dev server
+- **Docker** - Containerization
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
-- **PostCSS** - CSS processing
 
 ## 📱 Pages & Features
 

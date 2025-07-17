@@ -8,6 +8,10 @@ import Contracts from "@/pages/contracts";
 import Arbitrage from "@/pages/arbitrage";
 import Analytics from "@/pages/analytics";
 import Tools from "@/pages/tools";
+import Charts from "@/pages/charts";
+import Overview from "@/pages/overview";
+import Matching from "@/pages/matching";
+import Calculators from "@/pages/calculators";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,6 +23,10 @@ function Router() {
       <Route path="/arbitrage" component={Arbitrage} />
       <Route path="/analytics" component={Analytics} />
       <Route path="/tools" component={Tools} />
+      <Route path="/charts" component={Charts} />
+      <Route path="/overview" component={Overview} />
+      <Route path="/matching" component={Matching} />
+      <Route path="/calculators" component={Calculators} />
       <Route component={NotFound} />
     </Switch>
   );

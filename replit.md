@@ -137,6 +137,10 @@ Preferred communication style: Simple, everyday language.
 3. **Arbitrage**: Cross-platform arbitrage analysis with opportunity tracking
 4. **Analytics**: Advanced analytics with probability modeling and market analysis
 5. **Tools**: Trading calculators, utilities, and user preferences
+6. **Charts**: Price charts with multiple timeframes and technical analysis
+7. **Overview**: Market overview with sector breakdowns and performance metrics
+8. **Matching**: Contract matching system with similarity analysis
+9. **Calculators**: Financial calculators for arbitrage, sweep pricing, and position sizing
 
 ### Planned Features
 1. **News Integration**: Market event correlation with price movements

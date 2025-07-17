@@ -21,6 +21,7 @@ import {
   type OrderBookAnalytics,
   type LiquidityMetrics
 } from "@shared/schema";
+import { kalshiService } from "./kalshi-service";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -266,7 +267,13 @@ export class MemStorage implements IStorage {
   }
 
   async getContracts(): Promise<Contract[]> {
-    return Array.from(this.contracts.values());
+    try {
+      return await kalshiService.getMarkets({ limit: 100 });
+    } catch (error) {
+      console.error('Failed to fetch contracts from Kalshi service:', error);
+      // Fallback to local data
+      return Array.from(this.contracts.values());
+    }
   }
 
   async getContract(id: number): Promise<Contract | undefined> {
@@ -338,25 +345,31 @@ export class MemStorage implements IStorage {
   }
 
   async getArbitrageOpportunities(): Promise<ArbitrageOpportunityWithContracts[]> {
-    const opportunities = Array.from(this.arbitrageOpportunities.values())
-      .filter(opp => opp.isActive);
-    
-    const result: ArbitrageOpportunityWithContracts[] = [];
-    
-    for (const opp of opportunities) {
-      const kalshiContract = this.contracts.get(opp.kalshiContractId!);
-      const polymarketContract = this.contracts.get(opp.polymarketContractId!);
+    try {
+      return await kalshiService.getArbitrageOpportunities();
+    } catch (error) {
+      console.error('Failed to fetch arbitrage opportunities from Kalshi service:', error);
+      // Fallback to local data
+      const opportunities = Array.from(this.arbitrageOpportunities.values())
+        .filter(opp => opp.isActive);
       
-      if (kalshiContract && polymarketContract) {
-        result.push({
-          ...opp,
-          kalshiContract,
-          polymarketContract
-        });
+      const result: ArbitrageOpportunityWithContracts[] = [];
+      
+      for (const opp of opportunities) {
+        const kalshiContract = this.contracts.get(opp.kalshiContractId!);
+        const polymarketContract = this.contracts.get(opp.polymarketContractId!);
+        
+        if (kalshiContract && polymarketContract) {
+          result.push({
+            ...opp,
+            kalshiContract,
+            polymarketContract
+          });
+        }
       }
+      
+      return result;
     }
-    
-    return result;
   }
 
   async createArbitrageOpportunity(insertOpportunity: InsertArbitrageOpportunity): Promise<ArbitrageOpportunity> {
@@ -371,23 +384,29 @@ export class MemStorage implements IStorage {
   }
 
   async getDashboardStats(): Promise<DashboardStats> {
-    const contracts = Array.from(this.contracts.values());
-    const opportunities = Array.from(this.arbitrageOpportunities.values()).filter(opp => opp.isActive);
-    
-    const totalVolume = contracts.reduce((sum, contract) => 
-      sum + parseFloat(contract.volume || '0'), 0);
-    
-    const totalLiquidity = contracts.reduce((sum, contract) => 
-      sum + parseFloat(contract.liquidity || '0'), 0);
-    
-    const avgLiquidity = contracts.length > 0 ? totalLiquidity / contracts.length : 0;
-    
-    return {
-      totalVolume: `$${(totalVolume / 1000000).toFixed(1)}M`,
-      activeContracts: contracts.filter(c => c.isActive).length,
-      arbitrageOpportunities: opportunities.length,
-      avgLiquidity: `${avgLiquidity.toFixed(1)}%`
-    };
+    try {
+      return await kalshiService.getDashboardStats();
+    } catch (error) {
+      console.error('Failed to fetch dashboard stats from Kalshi service:', error);
+      // Fallback to local data
+      const contracts = Array.from(this.contracts.values());
+      const opportunities = Array.from(this.arbitrageOpportunities.values()).filter(opp => opp.isActive);
+      
+      const totalVolume = contracts.reduce((sum, contract) => 
+        sum + parseFloat(contract.volume || '0'), 0);
+      
+      const totalLiquidity = contracts.reduce((sum, contract) => 
+        sum + parseFloat(contract.liquidity || '0'), 0);
+      
+      const avgLiquidity = contracts.length > 0 ? totalLiquidity / contracts.length : 0;
+      
+      return {
+        totalVolume: `$${(totalVolume / 1000000).toFixed(1)}M`,
+        activeContracts: contracts.filter(c => c.isActive).length,
+        arbitrageOpportunities: opportunities.length,
+        avgLiquidity: `${avgLiquidity.toFixed(1)}%`
+      };
+    }
   }
 
   async getChartData(contractId: number, timeframe: string): Promise<ChartDataPoint[]> {

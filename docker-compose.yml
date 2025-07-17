@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  kalshi-api:
+    build:
+      context: ./python-service
+      dockerfile: Dockerfile
+    container_name: kalshi-api
+    ports:
+      - "8000:8000"
+    environment:
+      - KALSHI_BASE_URL=${KALSHI_BASE_URL:-https://trading-api.kalshi.com/trade-api/v2}
+      - KALSHI_EMAIL=${KALSHI_EMAIL}
+      - KALSHI_PASSWORD=${KALSHI_PASSWORD}
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./python-service:/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: kalshi-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PYTHON_SERVICE_URL=http://kalshi-api:8000
+      - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      kalshi-api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: kalshi-frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: kalshi-network 

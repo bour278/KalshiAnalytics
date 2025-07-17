@@ -2,7 +2,6 @@
 
 > A comprehensive analytics and arbitrage detection platform for prediction market trading
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC.svg)](https://tailwindcss.com/)
@@ -123,25 +122,3 @@ KalshiAnalytics/
 | **Analytics** | Advanced analysis | Probability modeling, information flow |
 | **Charts** | Price visualization | Technical analysis, multiple timeframes |
 | **Tools** | Trading utilities | Calculators, alerts, data export |
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-**Josep Aldover** - [@bour278](https://github.com/bour278) - josephaldojbbr@gmail.com
-
-Project Link: [https://github.com/bour278/KalshiAnalytics](https://github.com/bour278/KalshiAnalytics)
-
----
-
-⭐ **Star this repository if you find it helpful!** 

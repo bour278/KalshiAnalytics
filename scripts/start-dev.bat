@@ -1,12 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo 🚀 Starting Kalshi Analytics Development Environment
+echo.
+echo ====================================================================
+echo = Starting Kalshi Analytics Development Environment
+echo ====================================================================
+echo.
 
 REM Check if Python is installed
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Python is required but not installed
+    echo [ERROR] Python is required but not installed
     pause
     exit /b 1
 )
@@ -14,25 +18,21 @@ if %errorlevel% neq 0 (
 REM Check if Node.js is installed
 node --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Node.js is required but not installed
+    echo [ERROR] Node.js is required but not installed
     pause
     exit /b 1
 )
 
-REM Check if npm is installed
-npm --version >nul 2>&1
-if %errorlevel% neq 0 (
-    echo ❌ npm is required but not installed
-    pause
-    exit /b 1
-)
-
-echo 📦 Starting Python Kalshi API service...
-cd python-service
+echo.
+echo =================================================
+echo = Starting Python Data Service (Backend)
+echo =================================================
+echo.
+cd backend\data-service
 
 REM Check if virtual environment exists, create if not
 if not exist "venv" (
-    echo 🔨 Creating Python virtual environment...
+    echo [INFO] Creating Python virtual environment...
     python -m venv venv
 )
 
@@ -40,35 +40,39 @@ REM Activate virtual environment
 call venv\Scripts\activate.bat
 
 REM Install dependencies
-echo 📥 Installing Python dependencies...
-pip install -r requirements.txt
+echo [INFO] Installing Python dependencies...
+pip install -r requirements.txt >nul
 
-REM Check if config.env exists
-if not exist "config.env" (
-    echo ❌ config.env file not found in python-service directory
-    echo 📝 Please create config.env with your Kalshi API credentials:
-    echo KALSHI_EMAIL=your-email@example.com
-    echo KALSHI_PASSWORD=your-password
+REM Check if .env exists
+if not exist ".env" (
+    echo [ERROR] .env file not found in backend/data-service directory
+    echo [INFO] Please create .env with your Kalshi API credentials:
     echo KALSHI_BASE_URL=https://trading-api.kalshi.com/trade-api/v2
+    echo KALSHI_API_KEY=your_actual_api_key_here
     pause
     exit /b 1
 )
 
 REM Start Python service in background
-echo 🐍 Starting Python service on port 8000...
+echo [INFO] Starting Python service on port 8000...
 start /B python main.py
 
-cd ..
+cd ..\..
 
 REM Wait a bit for Python service to start
 timeout /t 5 /nobreak >nul
 
-echo 📦 Starting Node.js backend...
+echo.
+echo =================================================
+echo = Starting API Gateway (Backend)
+echo =================================================
+echo.
+cd backend\api-gateway
 
 REM Install dependencies if node_modules doesn't exist
 if not exist "node_modules" (
-    echo 📥 Installing Node.js dependencies...
-    npm install
+    echo [INFO] Installing Node.js dependencies...
+    npm install >nul
 )
 
 REM Set environment variables
@@ -76,18 +80,36 @@ set PYTHON_SERVICE_URL=http://localhost:8000
 set PORT=3000
 
 REM Start Node.js backend in background
-echo ⚡ Starting Node.js backend on port 3000...
+echo [INFO] Starting Node.js backend on port 3000...
 start /B npm run dev
+
+cd ..\..
 
 REM Wait a bit for Node.js backend to start
 timeout /t 3 /nobreak >nul
 
-echo 📦 Starting frontend development server...
-echo 🌐 Starting frontend on port 5173...
-echo 🔗 Open http://localhost:5173 in your browser
+echo.
+echo =================================================
+echo = Starting Frontend Development Server
+echo =================================================
+echo.
+cd frontend
+
+REM Install dependencies if node_modules doesn't exist
+if not exist "node_modules" (
+    echo [INFO] Installing Node.js dependencies...
+    npm install >nul
+)
+
+echo.
+echo =======================================================================
+echo.
+echo   [SUCCESS] Frontend is starting on http://localhost:5173
+echo.
+echo   You can now open your browser and navigate to this URL.
+echo.
+echo =======================================================================
+echo.
 
 REM Start frontend (this will be in foreground)
-npm run dev
-
-echo Press any key to stop all services...
-pause >nul 
+npm run dev 

@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import { setupVite, serveStatic, log } from "./vite-handler";
+import { KalshiStorage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -37,7 +38,8 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  const server = await registerRoutes(app);
+  const storage = new KalshiStorage();
+  const server = await registerRoutes(app, storage);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -59,7 +61,7 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on the port specified in the environment variable PORT
   // Default to 3000 for development, 5000 for production.
   // this serves both the API and the client.
-  const port = parseInt(process.env.PORT || (app.get("env") === "development" ? '3000' : '5000'), 10);
+  const port = parseInt(process.env.PORT || (app.get("env") === "development" ? '3001' : '5000'), 10);
   server.listen({
     port,
     host: "0.0.0.0",

@@ -8,8 +8,9 @@ import {
   insertArbitrageOpportunitySchema 
 } from "@shared/schema";
 import { z } from "zod";
+import type { IStorage } from "./storage";
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express, storage: IStorage): Promise<Server> {
   
   // Dashboard stats
   app.get("/api/dashboard/stats", async (req, res) => {

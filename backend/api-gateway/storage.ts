@@ -55,6 +55,76 @@ export interface IStorage {
   getLiquidityMetrics(): Promise<LiquidityMetrics>;
 }
 
+export class KalshiStorage implements IStorage {
+  async getContracts(): Promise<Contract[]> {
+    return kalshiService.getMarkets();
+  }
+
+  async getDashboardStats(): Promise<DashboardStats> {
+    return kalshiService.getDashboardStats();
+  }
+
+  async getMarketOverview(): Promise<MarketOverview> {
+    return kalshiService.getMarketOverview();
+  }
+
+  async getArbitrageOpportunities(): Promise<ArbitrageOpportunityWithContracts[]> {
+    return kalshiService.getArbitrageOpportunities();
+  }
+
+  async getOrderBookAnalytics(contractId: number): Promise<OrderBookAnalytics> {
+    const contract = await this.getContract(contractId);
+    if (!contract) {
+      throw new Error("Contract not found");
+    }
+    return kalshiService.getOrderBookAnalytics(contract.externalId);
+  }
+
+  async getChartData(contractId: number, timeframe: string): Promise<ChartDataPoint[]> {
+    const contract = await this.getContract(contractId);
+    if (!contract || !contract.seriesTicker) {
+      // Return empty array if contract or seriesTicker is not available
+      return [];
+    }
+    return kalshiService.getChartData(contract.externalId, contract.seriesTicker, timeframe);
+  }
+
+  async getOrderBookData(contractId: number): Promise<OrderBookData[]> {
+    const contract = await this.getContract(contractId);
+    if (!contract) {
+      throw new Error("Contract not found");
+    }
+    return kalshiService.getOrderBook(contract.externalId);
+  }
+
+  // --- Methods that still need implementation or use a database ---
+
+  async getContract(id: number): Promise<Contract | undefined> {
+    // This would typically fetch from a database. For now, we'll fetch all and find by ID.
+    const contracts = await this.getContracts();
+    return contracts.find(c => c.id === id);
+  }
+
+  // The following methods would require a database or more complex logic to implement
+  // with the current Kalshi service. Returning empty/default values for now.
+
+  async getLiquidityMetrics(): Promise<LiquidityMetrics> {
+    return kalshiService.getLiquidityMetrics();
+  }
+  
+  // (getUser, getUserByUsername, createUser, etc. would need a database)
+  async getUser(id: number): Promise<User | undefined> { return undefined; }
+  async getUserByUsername(username: string): Promise<User | undefined> { return undefined; }
+  async createUser(user: InsertUser): Promise<User> { throw new Error("Not implemented"); }
+  async getContractsByPlatform(platform: string): Promise<Contract[]> { return []; }
+  async createContract(contract: InsertContract): Promise<Contract> { throw new Error("Not implemented"); }
+  async updateContract(id: number, updates: Partial<Contract>): Promise<Contract | undefined> { throw new Error("Not implemented"); }
+  async getPriceHistory(contractId: number, limit?: number): Promise<PriceHistory[]> { return []; }
+  async createPriceHistory(priceHistory: InsertPriceHistory): Promise<PriceHistory> { throw new Error("Not implemented"); }
+  async createOrderBookData(orderBookData: InsertOrderBookData): Promise<OrderBookData> { throw new Error("Not implemented"); }
+  async createArbitrageOpportunity(opportunity: InsertArbitrageOpportunity): Promise<ArbitrageOpportunity> { throw new Error("Not implemented"); }
+}
+
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private contracts: Map<number, Contract>;

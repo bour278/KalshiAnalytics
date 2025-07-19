@@ -349,26 +349,18 @@ class AnalyticsEngine:
         return gaps
     
     async def find_arbitrage_opportunities(self, client: KalshiClient) -> List[ArbitrageOpportunity]:
-        """Find arbitrage opportunities across markets"""
-        opportunities = []
-        
+        """Find arbitrage opportunities within Kalshi markets."""
         try:
-            # Get all active markets
-            markets = await client.get_markets(limit=500)
+            # For now, we will disable the group arbitrage check to avoid rate limiting.
+            # This is where the application was making too many requests.
+            # A better long-term solution is to use websockets for a real-time data feed.
             
-            # Group markets by similar events/topics for comparison
-            market_groups = self._group_similar_markets(markets)
+            # grouped_opportunities = await self._find_group_arbitrage(client)
+            simple_opportunities = await self._find_simple_arbitrage(client)
             
-            # Look for arbitrage within each group
-            for group in market_groups:
-                group_opportunities = await self._find_group_arbitrage(client, group)
-                opportunities.extend(group_opportunities)
-            
-            # Sort by potential profit
-            opportunities.sort(key=lambda x: x.potential_profit, reverse=True)
-            
-            return opportunities[:50]  # Return top 50 opportunities
-            
+            # return grouped_opportunities + simple_opportunities
+            return simple_opportunities
+
         except Exception as e:
             logger.error(f"Error finding arbitrage opportunities: {e}")
             return []

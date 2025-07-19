@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - refactor
+  push:
+    branches:
+      - main
+      - refactor
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+      - name: Lint frontend
+        run: |
+          cd frontend
+          npm run lint
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install backend dependencies
+        run: |
+          cd backend/data-service
+          pip install -r requirements.txt
+
+      - name: Lint backend
+        run: |
+          cd backend/data-service
+          # Add linting command here, e.g., pylint **/*.py or flake8 .
+          echo "Linting backend..."
+
+      - name: Test backend
+        run: |
+          cd backend/data-service
+          # Add test command here, e.g., pytest
+          echo "Testing backend..." 

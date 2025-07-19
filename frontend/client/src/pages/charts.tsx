@@ -37,8 +37,8 @@ export default function Charts() {
   const formatPrice = (price: number) => `$${price.toFixed(2)}`;
   const formatVolume = (volume: number) => `$${(volume / 1000).toFixed(0)}k`;
 
-  // Calculate statistics
-  const stats = chartData ? {
+  // Calculate statistics safely
+  const stats = (chartData && chartData.length > 0) ? {
     current: chartData[chartData.length - 1]?.price || 0,
     change: chartData.length > 1 ? chartData[chartData.length - 1].price - chartData[0].price : 0,
     high: Math.max(...chartData.map(d => d.price)),

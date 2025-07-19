@@ -30,7 +30,7 @@ fi
 # Function to start Python service
 start_python_service() {
     echo -e "${YELLOW}📦 Starting Python Kalshi API service...${NC}"
-    cd python-service
+    cd backend/data-service
     
     # Check if virtual environment exists, create if not
     if [ ! -d "venv" ]; then
@@ -47,7 +47,7 @@ start_python_service() {
     
     # Check if config.env exists
     if [ ! -f "config.env" ]; then
-        echo -e "${RED}❌ config.env file not found in python-service directory${NC}"
+        echo -e "${RED}❌ config.env file not found in backend/data-service directory${NC}"
         echo -e "${YELLOW}📝 Please create config.env with your Kalshi API credentials:${NC}"
         echo "KALSHI_EMAIL=your-email@example.com"
         echo "KALSHI_PASSWORD=your-password"
@@ -63,13 +63,14 @@ start_python_service() {
     python main.py &
     PYTHON_PID=$!
     
-    cd ..
+    cd ../..
 }
 
 # Function to start Node.js backend
 start_nodejs_backend() {
     echo -e "${YELLOW}📦 Starting Node.js backend...${NC}"
-    
+    cd backend/api-gateway
+
     # Install dependencies if node_modules doesn't exist
     if [ ! -d "node_modules" ]; then
         echo -e "${YELLOW}📥 Installing Node.js dependencies...${NC}"
@@ -84,15 +85,24 @@ start_nodejs_backend() {
     echo -e "${GREEN}⚡ Starting Node.js backend on port 3000...${NC}"
     npm run dev &
     NODEJS_PID=$!
+    cd ../..
 }
 
 # Function to start frontend
 start_frontend() {
     echo -e "${YELLOW}📦 Starting frontend development server...${NC}"
+    cd frontend
     
+    # Install dependencies if node_modules doesn't exist
+    if [ ! -d "node_modules" ]; then
+        echo -e "${YELLOW}📥 Installing Node.js dependencies...${NC}"
+        npm install
+    fi
+
     # Start frontend (this will be in foreground)
     echo -e "${GREEN}🌐 Starting frontend on port 5173...${NC}"
     echo -e "${BLUE}🔗 Open http://localhost:5173 in your browser${NC}"
+    npm run dev
 }
 
 # Function to cleanup on exit

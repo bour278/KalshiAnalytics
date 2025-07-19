@@ -180,35 +180,9 @@ export class KalshiService {
     };
   }
 
-  async getChartData(marketTicker: string, timeframe: string = '1D'): Promise<ChartDataPoint[]> {
-    // For now, we'll generate chart data from market analytics
-    // In a real implementation, this would come from historical data
-    const markets = await this.getMarkets({ limit: 1 });
-    const market = markets.find(m => m.id.toString() === marketTicker);
-    
-    if (!market) {
-      return [];
-    }
-
-    // Generate sample chart data based on current price
-    const currentPrice = parseFloat(market.currentPrice || '0.5');
-    const points: ChartDataPoint[] = [];
-    const now = new Date();
-    
-    for (let i = 23; i >= 0; i--) {
-      const timestamp = new Date(now.getTime() - i * 60 * 60 * 1000).toISOString();
-      const variation = (Math.random() - 0.5) * 0.1; // ±5% variation
-      const price = Math.max(0.01, Math.min(0.99, currentPrice + variation));
-      const volume = Math.floor(Math.random() * 1000) + 100;
-      
-      points.push({
-        timestamp,
-        price,
-        volume
-      });
-    }
-    
-    return points;
+  async getChartData(marketTicker: string, seriesTicker: string, timeframe: string): Promise<any[]> {
+    const response = await this.makeRequest("GET", `/series/${seriesTicker}/markets/${marketTicker}/candlesticks`);
+    return response.candlesticks || [];
   }
 
   async getMarketOverview(): Promise<MarketOverview> {

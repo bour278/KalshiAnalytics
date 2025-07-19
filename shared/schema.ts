@@ -11,6 +11,8 @@ export const users = pgTable("users", {
 export const contracts = pgTable("contracts", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
+  subtitle: text("subtitle"),
+  yesSubTitle: text("yes_sub_title"),
   description: text("description"),
   category: text("category").notNull(),
   platform: text("platform").notNull(), // 'kalshi' or 'polymarket'

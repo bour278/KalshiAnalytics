@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import uvicorn
 import os
 from dotenv import load_dotenv
+from loguru import logger
 
 from kalshi_client import KalshiClient
 from models import (
@@ -28,16 +29,20 @@ async def lifespan(app: FastAPI):
     
     # Initialize Kalshi client
     kalshi_client = KalshiClient(
-        base_url=os.getenv("KALSHI_BASE_URL", "https://trading-api.kalshi.com/trade-api/v2"),
-        email=os.getenv("KALSHI_EMAIL"),
-        password=os.getenv("KALSHI_PASSWORD")
+        base_url=os.getenv("KALSHI_BASE_URL"),
+        api_key=os.getenv("KALSHI_API_KEY")
     )
     
     # Initialize analytics engine
     analytics_engine = AnalyticsEngine()
     
-    # Authenticate with Kalshi
-    await kalshi_client.authenticate()
+    # Try to authenticate with Kalshi (make it optional for development)
+    try:
+        await kalshi_client.authenticate()
+        logger.info("Successfully authenticated with Kalshi API")
+    except Exception as e:
+        logger.warning(f"Failed to authenticate with Kalshi API: {e}")
+        logger.info("Continuing without authentication for development")
     
     yield
     

@@ -163,14 +163,8 @@ export default function Contracts() {
                           {filteredContracts?.map((contract) => (
                             <TableRow key={contract.id} className="hover:bg-slate-700/50">
                               <TableCell>
-                                <div className="max-w-xs">
-                                  <div className="font-medium text-slate-50 truncate">
-                                    {contract.title}
-                                  </div>
-                                  <div className="text-xs text-slate-400 truncate">
-                                    {contract.description}
-                                  </div>
-                                </div>
+                                <div className="font-medium">{contract.title}</div>
+                                <div className="text-sm text-muted-foreground">{contract.yesSubTitle || contract.subtitle}</div>
                               </TableCell>
                               <TableCell>
                                 {getPlatformBadge(contract.platform)}

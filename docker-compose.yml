@@ -3,7 +3,7 @@ version: '3.8'
 services:
   kalshi-api:
     build:
-      context: ./python-service
+      context: ./backend/data-service
       dockerfile: Dockerfile
     container_name: kalshi-api
     ports:
@@ -16,7 +16,7 @@ services:
       - PORT=8000
       - LOG_LEVEL=INFO
     volumes:
-      - ./python-service:/app
+      - ./backend/data-service:/app
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
@@ -27,7 +27,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./backend/api-gateway
       dockerfile: Dockerfile.backend
     container_name: kalshi-backend
     ports:
@@ -37,7 +37,7 @@ services:
       - PYTHON_SERVICE_URL=http://kalshi-api:8000
       - DATABASE_URL=${DATABASE_URL}
     volumes:
-      - .:/app
+      - ./backend/api-gateway:/app
       - /app/node_modules
     depends_on:
       kalshi-api:
@@ -46,7 +46,7 @@ services:
 
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile.frontend
     container_name: kalshi-frontend
     ports:
@@ -54,7 +54,7 @@ services:
     environment:
       - VITE_API_URL=http://localhost:3000
     volumes:
-      - .:/app
+      - ./frontend:/app
       - /app/node_modules
     depends_on:
       - backend

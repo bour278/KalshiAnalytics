@@ -9,8 +9,10 @@ class OrderSide(str, Enum):
 
 class MarketStatus(str, Enum):
     OPEN = "open"
+    ACTIVE = "active"
     CLOSED = "closed"
     SETTLED = "settled"
+    INITIALIZED = "initialized"
 
 class ConfidenceLevel(str, Enum):
     HIGH = "high"
@@ -22,21 +24,25 @@ class KalshiMarket(BaseModel):
     ticker: str
     title: str
     subtitle: Optional[str] = None
+    yes_sub_title: Optional[str] = None
     event_ticker: str
-    series_ticker: str
+    series_ticker: Optional[str] = None
     status: MarketStatus
-    yes_price: Optional[float] = None
-    no_price: Optional[float] = None
+    yes_price: Optional[float] = Field(None, alias="yes_ask") # Using yes_ask as price
+    no_price: Optional[float] = Field(None, alias="no_ask") # Using no_ask as price
     last_price: Optional[float] = None
     volume: Optional[int] = 0
     open_interest: Optional[int] = 0
-    expiry_date: Optional[datetime] = None
-    close_date: Optional[datetime] = None
+    expiry_date: Optional[datetime] = Field(None, alias="expiration_time")
+    close_date: Optional[datetime] = Field(None, alias="close_time")
     strike_price: Optional[float] = None
     category: Optional[str] = None
     can_close_early: Optional[bool] = False
     floor_price: Optional[float] = None
     cap_price: Optional[float] = None
+    
+    class Config:
+        allow_population_by_field_name = True
 
 class KalshiOrderBookLevel(BaseModel):
     price: float

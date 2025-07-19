@@ -12,7 +12,7 @@ from models import (
 )
 
 class RateLimiter:
-    def __init__(self, requests_per_minute: int = 60):
+    def __init__(self, requests_per_minute: int = 45): # Lowered from 60 to 45
         self.requests_per_minute = requests_per_minute
         self.requests = []
     
@@ -23,25 +23,31 @@ class RateLimiter:
         
         if len(self.requests) >= self.requests_per_minute:
             # Need to wait
-            oldest_request = min(self.requests)
+            oldest_request = self.requests[0] # The first element is the oldest
             wait_time = 60 - (now - oldest_request)
             if wait_time > 0:
-                logger.info(f"Rate limit reached, waiting {wait_time:.2f} seconds")
+                logger.warning(f"Rate limit reached. Waiting for {wait_time:.2f} seconds.")
                 await asyncio.sleep(wait_time)
         
-        self.requests.append(now)
+        # It's now safe to add the new request time
+        self.requests.append(time.time())
 
 class KalshiClient:
-    def __init__(self, base_url: str, email: str, password: str, 
+    def __init__(self, base_url: str, api_key: str, 
                  rate_limit_requests_per_minute: int = 60):
         self.base_url = base_url.rstrip('/')
-        self.email = email
-        self.password = password
+        self.api_key = api_key
         self.rate_limiter = RateLimiter(rate_limit_requests_per_minute)
         self.session: Optional[httpx.AsyncClient] = None
-        self.auth_token: Optional[str] = None
-        self.token_expires_at: Optional[datetime] = None
+        self.authenticated = False
         
+    async def authenticate(self):
+        """Authenticate with Kalshi API"""
+        # For API key authentication, we don't need to call a login endpoint
+        # The API key is sent with each request in the Authorization header
+        self.authenticated = True
+        logger.info("KalshiClient authenticated successfully")
+    
     async def _get_session(self) -> httpx.AsyncClient:
         if self.session is None:
             self.session = httpx.AsyncClient(
@@ -57,20 +63,14 @@ class KalshiClient:
     
     async def _make_request(self, method: str, endpoint: str, 
                            params: Optional[Dict] = None, 
-                           json_data: Optional[Dict] = None,
-                           requires_auth: bool = True) -> Dict[str, Any]:
+                           json_data: Optional[Dict] = None) -> Dict[str, Any]:
         """Make HTTP request with rate limiting and error handling"""
         await self.rate_limiter.wait_if_needed()
-        
-        if requires_auth and not await self._is_authenticated():
-            await self.authenticate()
         
         session = await self._get_session()
         url = f"{self.base_url}{endpoint}"
         
-        headers = {}
-        if requires_auth and self.auth_token:
-            headers["Authorization"] = f"Bearer {self.auth_token}"
+        headers = {"accept": "application/json"}
         
         try:
             logger.debug(f"Making {method} request to {url}")
@@ -82,7 +82,13 @@ class KalshiClient:
                 headers=headers
             )
             response.raise_for_status()
-            return response.json()
+            
+            # Log raw response
+            raw_data = response.json()
+            logger.info(f"Received data from {url}:")
+            logger.info(json.dumps(raw_data, indent=2))
+            
+            return raw_data
         
         except httpx.HTTPStatusError as e:
             logger.error(f"HTTP error {e.response.status_code} for {url}: {e.response.text}")
@@ -93,46 +99,6 @@ class KalshiClient:
         except Exception as e:
             logger.error(f"Unexpected error for {url}: {str(e)}")
             raise Exception(f"Unexpected error: {str(e)}")
-    
-    async def _is_authenticated(self) -> bool:
-        """Check if we have a valid authentication token"""
-        if not self.auth_token:
-            return False
-        
-        if self.token_expires_at and datetime.utcnow() >= self.token_expires_at:
-            return False
-        
-        return True
-    
-    async def authenticate(self):
-        """Authenticate with Kalshi API"""
-        logger.info("Authenticating with Kalshi API")
-        
-        login_data = {
-            "email": self.email,
-            "password": self.password
-        }
-        
-        try:
-            response = await self._make_request(
-                "POST", 
-                "/login", 
-                json_data=login_data, 
-                requires_auth=False
-            )
-            
-            self.auth_token = response.get("token")
-            if not self.auth_token:
-                raise Exception("No auth token received from login")
-            
-            # Assume token expires in 1 hour (adjust based on Kalshi's actual expiry)
-            self.token_expires_at = datetime.utcnow() + timedelta(hours=1)
-            
-            logger.info("Successfully authenticated with Kalshi API")
-            
-        except Exception as e:
-            logger.error(f"Authentication failed: {str(e)}")
-            raise Exception(f"Failed to authenticate: {str(e)}")
     
     async def get_markets(self, limit: int = 100, cursor: Optional[str] = None,
                          event_ticker: Optional[str] = None,
@@ -173,20 +139,24 @@ class KalshiClient:
     async def get_market_trades(self, market_ticker: str, limit: int = 100) -> List[KalshiTrade]:
         """Get recent trades for a market"""
         params = {"limit": limit}
-        response = await self._make_request("GET", f"/markets/{market_ticker}/trades", params=params)
+        # This endpoint gets all trades, so we will filter by market_ticker.
+        # This can be inefficient if there are many trades.
+        logger.info("Fetching all trades and filtering by market_ticker. This may be slow.")
+        response = await self._make_request("GET", f"/markets/trades", params=params)
         
         trades = []
         for trade_data in response.get("trades", []):
-            try:
-                trade = self._parse_trade(market_ticker, trade_data)
-                trades.append(trade)
-            except Exception as e:
-                logger.warning(f"Failed to parse trade: {e}")
-                continue
+            if trade_data.get("market_ticker") == market_ticker:
+                try:
+                    trade = self._parse_trade(market_ticker, trade_data)
+                    trades.append(trade)
+                except Exception as e:
+                    logger.warning(f"Failed to parse trade: {e}")
+                    continue
         
         return trades
     
-    async def get_market_candlesticks(self, market_ticker: str, 
+    async def get_market_candlesticks(self, series_ticker: str, market_ticker: str, 
                                     start_ts: Optional[int] = None,
                                     end_ts: Optional[int] = None,
                                     period_interval: int = 1,
@@ -204,7 +174,7 @@ class KalshiClient:
         
         response = await self._make_request(
             "GET", 
-            f"/markets/{market_ticker}/candlesticks", 
+            f"/series/{series_ticker}/markets/{market_ticker}/candlesticks", 
             params=params
         )
         
@@ -228,6 +198,11 @@ class KalshiClient:
         response = await self._make_request("GET", "/events", params=params)
         return response.get("events", [])
     
+    async def get_event(self, event_ticker: str) -> Dict[str, Any]:
+        """Get a specific event by its ticker"""
+        response = await self._make_request("GET", f"/events/{event_ticker}")
+        return response.get("event", {})
+    
     async def get_series(self, limit: int = 100, cursor: Optional[str] = None) -> List[Dict[str, Any]]:
         """Get series from Kalshi API"""
         params = {"limit": limit}
@@ -236,49 +211,47 @@ class KalshiClient:
         
         response = await self._make_request("GET", "/series", params=params)
         return response.get("series", [])
+
+    async def get_series_by_ticker(self, series_ticker: str) -> Dict[str, Any]:
+        """Get a specific series by its ticker"""
+        response = await self._make_request("GET", f"/series/{series_ticker}")
+        return response.get("series", {})
     
     def _parse_market(self, market_data: Dict[str, Any]) -> KalshiMarket:
         """Parse market data from API response"""
-        return KalshiMarket(
-            ticker=market_data["ticker"],
-            title=market_data.get("title", ""),
-            subtitle=market_data.get("subtitle"),
-            event_ticker=market_data.get("event_ticker", ""),
-            series_ticker=market_data.get("series_ticker", ""),
-            status=MarketStatus(market_data.get("status", "open")),
-            yes_price=market_data.get("yes_price"),
-            no_price=market_data.get("no_price"),
-            last_price=market_data.get("last_price"),
-            volume=market_data.get("volume", 0),
-            open_interest=market_data.get("open_interest", 0),
-            expiry_date=self._parse_datetime(market_data.get("expiry_date")),
-            close_date=self._parse_datetime(market_data.get("close_date")),
-            strike_price=market_data.get("strike_price"),
-            category=market_data.get("category"),
-            can_close_early=market_data.get("can_close_early", False),
-            floor_price=market_data.get("floor_price"),
-            cap_price=market_data.get("cap_price")
-        )
+        # Pydantic will automatically map fields and handle aliases
+        return KalshiMarket.parse_obj(market_data)
     
     def _parse_orderbook(self, market_ticker: str, orderbook_data: Dict[str, Any]) -> KalshiOrderBook:
-        """Parse order book data from API response"""
-        yes_bids = [
-            KalshiOrderBookLevel(price=level[0], size=level[1])
-            for level in orderbook_data.get("yes", {}).get("bids", [])
-        ]
-        yes_asks = [
-            KalshiOrderBookLevel(price=level[0], size=level[1])
-            for level in orderbook_data.get("yes", {}).get("asks", [])
-        ]
-        no_bids = [
-            KalshiOrderBookLevel(price=level[0], size=level[1])
-            for level in orderbook_data.get("no", {}).get("bids", [])
-        ]
-        no_asks = [
-            KalshiOrderBookLevel(price=level[0], size=level[1])
-            for level in orderbook_data.get("no", {}).get("asks", [])
-        ]
-        
+        """Parse order book data from API response, handling potential None values."""
+        yes_data = orderbook_data.get("yes")
+        no_data = orderbook_data.get("no")
+
+        # The API can return a list for bids/asks, or it can be a dict with 'bids'/'asks' keys.
+        # We need to handle both cases, as well as when the data is None.
+
+        def get_levels(data, side):
+            if data is None:
+                return []
+            
+            # Check if data is a dict containing the side
+            if isinstance(data, dict) and side in data:
+                return [KalshiOrderBookLevel(price=level[0], size=level[1]) for level in data[side]]
+            
+            # Check if data is a direct list of levels (assuming it's for bids if not specified)
+            if isinstance(data, list):
+                 return [KalshiOrderBookLevel(price=level[0], size=level[1]) for level in data]
+
+            return []
+
+        # Assuming the API may not always provide 'bids' and 'asks' keys, 
+        # and might just return a list for 'yes' or 'no'.
+        # This implementation will need to be adjusted if the structure is more complex.
+        yes_bids = get_levels(yes_data, 'bids') if isinstance(yes_data, dict) else get_levels(yes_data, None)
+        yes_asks = get_levels(yes_data, 'asks') if isinstance(yes_data, dict) else []
+        no_bids = get_levels(no_data, 'bids') if isinstance(no_data, dict) else get_levels(no_data, None)
+        no_asks = get_levels(no_data, 'asks') if isinstance(no_data, dict) else []
+
         return KalshiOrderBook(
             market_ticker=market_ticker,
             yes_bids=yes_bids,
